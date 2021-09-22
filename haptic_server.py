@@ -12,18 +12,6 @@ from time import sleep
 # to the bhaptics player
 ws = create_connection("ws://192.168.1.53:80/ws")
 
-# Map bhaptics vest motor ids to my vests vr motors,
-# thier vest has 12 motors on each side when mine has 4.
-def map_front_motors(index):
-    if index in [0,1,4,5]:
-        return [1, 2]
-    if index in [2,3,6,7]:
-        return [4,3]
-    if index in [8,9,12,13,16,17]:
-        return [5,6]
-    if index in [10,11,14,15,18,19]:
-        return [7,8]
-
 async def server(websocket, path):
     while True:
         try:
@@ -43,13 +31,13 @@ async def server(websocket, path):
                         motors += map_front_motors(point['Index'])
 
                     # Turn the relevant motors on
-                    for motor in set(motors):
-                        ws.send("on_" + str(motor))
+                    GPIO.output(Relay_Ch1,GPIO.LOW)
+
                     # Sleep for the duration in milliseconds
                     sleep(duration/1000)
                     # Then turn all the motors off
-                    for motor in set(motors):
-                        ws.send("off_" + str(motor))
+                    GPIO.output(Relay_Ch1,GPIO.HIGH)
+
 
         except Exception as e:
             print(e)
